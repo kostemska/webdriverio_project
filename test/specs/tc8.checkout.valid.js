@@ -1,105 +1,55 @@
-import LoginPage from '../pageobjects/login.page.js';
-import InventoryPage from '../pageobjects/inventory.page.js';
-import CartPage from '../pageobjects/cart.page.js';
-import CheckoutPage from '../pageobjects/checkout.page.js';
-import { expect } from 'chai';
+import loginPage from '../pageobjects/login.page.js';
+import inventoryPage from '../pageobjects/inventory.page.js';
+import cartPage from '../pageobjects/cart.page.js';
+import checkoutPage from '../pageobjects/checkout.page.js';
+import { step } from '../utils/utils.js';
 
-describe('TC8 E2E - Complete valid checkout', () => {
+describe('TC8: Complete valid checkout', () => {
 
     before(async () => {
-        await LoginPage.open();
-        await browser.pause(2000); // бачимо сторінку відкритою
-        await LoginPage.login('standard_user', 'secret_sauce');
-        await browser.pause(2000); // бачимо введення логіну
-        const isInventoryDisplayed = await LoginPage.inventoryContainer.isDisplayed();
-        expect(isInventoryDisplayed).to.be.true;
+        await step('Open login page');
+        await loginPage.open();
+
+        await step('Login as standard_user');
+        await loginPage.login('standard_user', 'secret_sauce');
+
+        await expect(inventoryPage.inventoryContainer).toBeDisplayed();
     });
 
     it('should complete checkout with valid data', async () => {
-        // 1. Додаємо перший продукт у кошик
-        await InventoryPage.addToCartButtons[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await browser.pause(1000);
-        await InventoryPage.addToCartButtons[0].click();
-        await browser.pause(1500);
+        await step('Add first product to cart');
+        await inventoryPage.addToCartButtons[0].click();
 
-        const addedProductName = await InventoryPage.productNames[0].getText();
+        const addedProductName = await inventoryPage.productNames[0].getText();
+        await expect(inventoryPage.cartBadge).toHaveText('1');
 
-        const cartCount = await InventoryPage.cartBadge.getText();
-        expect(cartCount).to.equal('1');
+        await step('Go to cart page');
+        await inventoryPage.cartButton.click();
+        await expect(cartPage.cartHeader).toHaveTextContaining('Your Cart');
+        await expect(cartPage.cartItems[0].$('.inventory_item_name')).toHaveText(addedProductName);
 
-        // 2. Переходимо у кошик
-        await InventoryPage.cartButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await browser.pause(1000);
-        await InventoryPage.cartButton.click();
-        await browser.pause(2000);
+        await step('Checkout - fill info');
+        await cartPage.checkoutButton.click();
+        await expect(checkoutPage.checkoutHeader).toHaveTextContaining('Checkout');
 
-        const cartHeaderText = await CartPage.cartHeader.getText();
-        expect(cartHeaderText).to.include('Your Cart');
+        await checkoutPage.firstNameInput.setValue('Alona');
+        await checkoutPage.lastNameInput.setValue('Tester');
+        await checkoutPage.postalCodeInput.setValue('12345');
 
-        const cartItemName = await CartPage.cartItems[0].$('.inventory_item_name').getText();
-        expect(cartItemName).to.equal(addedProductName);
+        await step('Continue to overview');
+        await checkoutPage.continueButton.click();
+        await expect(checkoutPage.overviewHeader).toHaveTextContaining('Checkout: Overview');
+        await expect(checkoutPage.overviewItems[0].$('.inventory_item_name')).toHaveText(addedProductName);
 
-        // 3. Checkout
-        await CartPage.checkoutButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await browser.pause(1000);
-        await CartPage.checkoutButton.click();
-        await browser.pause(2000);
+        await step('Finish checkout');
+        await checkoutPage.finishButton.click();
+        await expect(checkoutPage.completeHeader).toHaveTextContaining('Checkout: Complete!');
+        await expect($('.complete-text')).toBeDisplayed();
 
-        const checkoutHeaderText = await CheckoutPage.checkoutHeader.getText();
-        expect(checkoutHeaderText).to.include('Checkout');
-
-        // 4. Заповнюємо форму
-        await CheckoutPage.firstNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await CheckoutPage.firstNameInput.setValue('Alona');
-        await browser.pause(500);
-
-        await CheckoutPage.lastNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await CheckoutPage.lastNameInput.setValue('Tester');
-        await browser.pause(500);
-
-        await CheckoutPage.postalCodeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await CheckoutPage.postalCodeInput.setValue('12345');
-        await browser.pause(500);
-
-        // 5. Continue -> Overview
-        await CheckoutPage.continueButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await browser.pause(500);
-        await CheckoutPage.continueButton.click();
-        await browser.pause(2000);
-
-        const overviewHeaderText = await CheckoutPage.overviewHeader.getText();
-        expect(overviewHeaderText).to.include('Checkout: Overview');
-
-        const overviewItemName = await CheckoutPage.overviewItems[0].$('.inventory_item_name').getText();
-        expect(overviewItemName).to.equal(addedProductName);
-
-        // 6. Finish -> Complete
-        await CheckoutPage.finishButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await browser.pause(500);
-        await CheckoutPage.finishButton.click();
-        await browser.pause(2000);
-
-        // Перевірка заголовку
-        const completeHeaderText = await CheckoutPage.completeHeader.getText();
-        expect(completeHeaderText).to.include('Checkout: Complete!');
-
-        // Перевірка повідомлення про завершення замовлення
-        const completeMessageElement = await $('.complete-text');
-        const isCompleteMessageDisplayed = await completeMessageElement.isDisplayed();
-        expect(isCompleteMessageDisplayed).to.be.true;
-
-        // 7. Back Home
-        await CheckoutPage.backHomeButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        await browser.pause(500);
-        await CheckoutPage.backHomeButton.click();
-        await browser.pause(2000);
-
-        const inventoryHeaderText = await InventoryPage.inventoryHeader.getText();
-        expect(inventoryHeaderText).to.include('Products');
-
-        // Перевірка, що кошик порожній
-        const cartBadgeExists = await InventoryPage.cartBadge.isExisting();
-        expect(cartBadgeExists).to.be.false;
+        await step('Back Home');
+        await checkoutPage.backHomeButton.click();
+        await expect(inventoryPage.inventoryHeader).toHaveTextContaining('Products');
+        await expect(inventoryPage.cartBadge).not.toBeExisting();
     });
 
     after(async () => {
