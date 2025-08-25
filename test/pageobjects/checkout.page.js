@@ -5,11 +5,8 @@ class CheckoutPage {
     get lastNameInput() { return $('#last-name'); }
     get postalCodeInput() { return $('#postal-code'); }
     get continueButton() { return $('#continue'); }
-    get overviewHeader() { return $('.header_secondary_container .title'); }
     get overviewItems() { return $$('.cart_item'); }
     get overviewItemNames() { return $$('div.cart_item div.inventory_item_name'); }
-    get overviewItemPrices() { return $$('div.cart_item div.inventory_item_price'); }
-    get totalPrice() { return $('.summary_total_label'); }
     get finishButton() { return $('#finish'); }
     get completeHeader() { return $('.header_secondary_container .title'); }
     get thankYouMessage() { return $('h2.complete-header'); }
@@ -22,16 +19,20 @@ class CheckoutPage {
         await this.postalCodeInput.setValue(postalCode);
     }
 
+    async continue() {
+        await this.continueButton.click();
+    }
+
+    async finish() {
+        await this.finishButton.click();
+    }
+
+    async backHome() {
+        await this.backHomeButton.click();
+    }
+
     async getOverviewItemName(index) {
         return await this.overviewItemNames[index].getText();
-    }
-
-    async getOverviewItemPrice(index) {
-        return await this.overviewItemPrices[index].getText();
-    }
-
-    async getTotalPriceText() {
-        return await this.totalPrice.getText();
     }
 
     async isThankYouMessageDisplayed() {
@@ -40,5 +41,6 @@ class CheckoutPage {
 }
 
 export default new CheckoutPage();
+
 
 

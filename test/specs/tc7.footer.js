@@ -10,8 +10,6 @@ describe('TC7: Verify footer social links', () => {
 
         await step('Login as standard_user');
         await loginPage.login('standard_user', 'secret_sauce');
-
-        await expect(inventoryPage.inventoryContainer).toBeDisplayed();
     });
 
     it('should open Twitter, Facebook and LinkedIn from footer', async () => {
@@ -21,27 +19,17 @@ describe('TC7: Verify footer social links', () => {
             { element: inventoryPage.linkedinIcon, url: 'https://www.linkedin.com/company/sauce-labs/' }
         ];
 
-        const mainWindow = await browser.getWindowHandle();
-
         for (let link of socialLinks) {
-            await link.element.click();
-
-            const allWindows = await browser.getWindowHandles();
-            const newWindow = allWindows.find(handle => handle !== mainWindow);
-            await browser.switchToWindow(newWindow);
+            const mainWindow = await inventoryPage.openSocialLink(link.element);
 
             await expect(browser).toHaveUrl(link.url);
 
-            await browser.closeWindow();
-            await browser.switchToWindow(mainWindow);
+            await inventoryPage.closeAndReturn(mainWindow);
         }
     });
-
-    after(async () => {
-        await browser.deleteSession();
-    });
-
 });
+
+
 
 
 

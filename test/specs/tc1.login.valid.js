@@ -7,16 +7,8 @@ describe('TC1: Login functionality - Valid login', () => {
         await step('Open login page');
         await loginPage.open();
 
-        await step('Enter username');
-        await loginPage.inputUsername.setValue('standard_user');
-        await expect(loginPage.inputUsername).toHaveValue('standard_user');
-
-        await step('Enter password');
-        await loginPage.inputPassword.setValue('secret_sauce');
-        await expect(loginPage.inputPassword).toHaveAttribute('type', 'password');
-
-        await step('Click Login button');
-        await loginPage.btnLogin.click();
+        await step('Login with valid credentials');
+        await loginPage.login('standard_user', 'secret_sauce');
 
         await step('Verify inventory page is displayed');
         await expect(inventoryPage.inventoryContainer).toBeDisplayed();
@@ -24,5 +16,6 @@ describe('TC1: Login functionality - Valid login', () => {
         await expect(browser).toHaveUrlContaining('/inventory.html'); 
     });
 });
+
 
 

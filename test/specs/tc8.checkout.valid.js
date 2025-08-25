@@ -12,42 +12,41 @@ describe('TC8: Complete valid checkout', () => {
 
         await step('Login as standard_user');
         await loginPage.login('standard_user', 'secret_sauce');
-
-        await expect(inventoryPage.inventoryContainer).toBeDisplayed();
     });
 
     it('should complete checkout with valid data', async () => {
-        await step('Add first product to cart');
-        await inventoryPage.addToCartButtons[0].click();
+        await step('Verify inventory page is displayed');
+        await expect(inventoryPage.inventoryContainer).toBeDisplayed();
 
-        const addedProductName = await inventoryPage.productNames[0].getText();
+        await step('Add first product to cart');
+        await inventoryPage.addFirstProductToCart();
+
+        const addedProductName = await inventoryPage.getFirstProductName();
         await expect(inventoryPage.cartBadge).toHaveText('1');
 
         await step('Go to cart page');
-        await inventoryPage.cartButton.click();
+        await inventoryPage.goToCart();
         await expect(cartPage.cartHeader).toHaveTextContaining('Your Cart');
-        await expect(cartPage.cartItems[0].$('.inventory_item_name')).toHaveText(addedProductName);
+
+        const cartItemName = await cartPage.getCartItemName(0);
+        await expect(cartItemName).toBe(addedProductName);
 
         await step('Checkout - fill info');
-        await cartPage.checkoutButton.click();
-        await expect(checkoutPage.checkoutHeader).toHaveTextContaining('Checkout');
-
-        await checkoutPage.firstNameInput.setValue('Alona');
-        await checkoutPage.lastNameInput.setValue('Tester');
-        await checkoutPage.postalCodeInput.setValue('12345');
+        await cartPage.checkout();
+        await checkoutPage.fillCheckoutForm('Alona', 'Tester', '12345');
 
         await step('Continue to overview');
-        await checkoutPage.continueButton.click();
-        await expect(checkoutPage.overviewHeader).toHaveTextContaining('Checkout: Overview');
-        await expect(checkoutPage.overviewItems[0].$('.inventory_item_name')).toHaveText(addedProductName);
+        await checkoutPage.continue();
+        const overviewItemName = await checkoutPage.getOverviewItemName(0);
+        await expect(overviewItemName).toBe(addedProductName);
 
         await step('Finish checkout');
-        await checkoutPage.finishButton.click();
+        await checkoutPage.finish();
         await expect(checkoutPage.completeHeader).toHaveTextContaining('Checkout: Complete!');
-        await expect($('.complete-text')).toBeDisplayed();
+        await expect(checkoutPage.thankYouMessage).toBeDisplayed();
 
         await step('Back Home');
-        await checkoutPage.backHomeButton.click();
+        await checkoutPage.backHome();
         await expect(inventoryPage.inventoryHeader).toHaveTextContaining('Products');
         await expect(inventoryPage.cartBadge).not.toBeExisting();
     });
@@ -57,4 +56,3 @@ describe('TC8: Complete valid checkout', () => {
     });
 
 });
-

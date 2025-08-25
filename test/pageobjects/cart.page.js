@@ -9,7 +9,8 @@ class CartPage {
 
     // Методи
     async getCartItemName(index) {
-        return await this.cartItemNames[index].getText();
+        const items = await this.cartItems;
+        return await items[index].$('.inventory_item_name').getText();
     }
 
     async getCartItemPrice(index) {
@@ -23,6 +24,11 @@ class CartPage {
     async isEmptyCartMessageDisplayed() {
         return await this.emptyCartMessage.isDisplayed();
     }
+
+    async checkout() {
+        await this.checkoutButton.click();
+    }
+
 }
 
 export default new CartPage();

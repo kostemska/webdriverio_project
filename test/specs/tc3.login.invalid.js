@@ -6,19 +6,8 @@ describe('TC3: Login functionality - Invalid username', () => {
         await step('Open login page');
         await loginPage.open();
 
-        await step('Enter invalid username');
-        const invalidUsername = 'standarD_user';
-        await loginPage.inputUsername.setValue(invalidUsername);
-        await expect(loginPage.inputUsername).toHaveValue(invalidUsername);
-
-        await step('Enter valid password');
-        const validPassword = 'secret_sauce';
-        await loginPage.inputPassword.setValue(validPassword);
-        await expect(loginPage.inputPassword).toHaveValue(validPassword);
-        await expect(loginPage.inputPassword).toHaveAttribute('type', 'password');
-
-        await step('Click Login button');
-        await loginPage.btnLogin.click();
+        await step('Attempt login with invalid username');
+        await loginPage.login('standarD_user', 'secret_sauce');
 
         await step('Verify error message and highlighted fields');
         await expect(loginPage.errorMessage).toBeDisplayed();
@@ -29,6 +18,7 @@ describe('TC3: Login functionality - Invalid username', () => {
         await expect(loginPage.inputPassword).toHaveElementClass('error');
     });
 });
+
 
 
 

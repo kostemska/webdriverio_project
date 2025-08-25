@@ -38,6 +38,41 @@ class InventoryPage {
         }
         return names;
     }
+    
+    async openBurgerMenu() {
+        await this.burgerMenu.click();
+    }
+
+    async logout() {
+        await this.logoutBtn.click();
+    }
+
+    async getFirstProductName() {
+        return await this.productNames[0].getText();
+    }
+
+    async addFirstProductToCart() {
+        await this.firstAddToCartBtn.click();
+    }
+
+    async goToCart() {
+        await this.cartButton.click();
+    }
+
+    async openSocialLink(element) {
+        const mainWindow = await browser.getWindowHandle();
+        await element.click();
+        const allWindows = await browser.getWindowHandles();
+        const newWindow = allWindows.find(handle => handle !== mainWindow);
+        await browser.switchToWindow(newWindow);
+        return mainWindow;
+    }
+
+    async closeAndReturn(mainWindow) {
+        await browser.closeWindow();
+        await browser.switchToWindow(mainWindow);
+    }
+
 }
 
 export default new InventoryPage();

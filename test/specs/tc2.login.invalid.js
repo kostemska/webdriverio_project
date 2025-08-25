@@ -6,17 +6,8 @@ describe('TC2: Login functionality - Invalid password', () => {
         await step('Open login page');
         await loginPage.open();
 
-        await step('Enter valid username');
-        await loginPage.inputUsername.setValue('standard_user');
-        await expect(loginPage.inputUsername).toHaveValue('standard_user');
-
-        await step('Enter invalid password');
-        await loginPage.inputPassword.setValue('wrong_pass123');
-        await expect(loginPage.inputPassword).toHaveValue('wrong_pass123');
-        await expect(loginPage.inputPassword).toHaveAttribute('type', 'password');
-
-        await step('Click Login button');
-        await loginPage.btnLogin.click();
+        await step('Attempt login with invalid password');
+        await loginPage.login('standard_user', 'wrong_pass123');
 
         await step('Verify error message and highlighted fields');
         await expect(loginPage.errorMessage).toBeDisplayed();

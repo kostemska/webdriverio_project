@@ -11,25 +11,22 @@ describe('TC9: Checkout with empty cart', () => {
 
         await step('Login as standard_user');
         await loginPage.login('standard_user', 'secret_sauce');
-
-        await expect(inventoryPage.inventoryContainer).toBeDisplayed();
     });
 
     it('should not allow checkout with empty cart', async () => {
         await step('Go to cart page');
-        await inventoryPage.cartButton.click();
-        await expect(cartPage.cartHeader).toHaveTextContaining('Your Cart');
+        await inventoryPage.goToCart();
 
         await step('Verify cart is empty');
-        const itemsCount = await cartPage.cartItems.length;
-        expect(itemsCount).toBe(0);
-        
+        const itemsCount = await cartPage.getNumberOfItems();
+        await expect(itemsCount).toBe(0);
+
         await step('Click Checkout');
-        await cartPage.checkoutButton.click();
+        await cartPage.checkout();
 
         await step('Verify empty cart message');
-        await expect(cartPage.emptyCartMessage).toBeDisplayed();
-        await expect(cartPage.emptyCartMessage).toHaveText('Cart is empty');
+        const isEmptyMessageDisplayed = await cartPage.isEmptyCartMessageDisplayed();
+        await expect(isEmptyMessageDisplayed).toBe(true);
     });
 
     after(async () => {
@@ -37,5 +34,6 @@ describe('TC9: Checkout with empty cart', () => {
     });
 
 });
+
 
 

@@ -10,7 +10,9 @@ describe('TC6: Login and verify product sorting visually + code', () => {
 
         await step('Login as standard_user');
         await loginPage.login('standard_user', 'secret_sauce');
+    });
 
+    it('Inventory page should be displayed after login', async () => {
         await expect(inventoryPage.inventoryContainer).toBeDisplayed();
     });
 
@@ -25,8 +27,7 @@ describe('TC6: Login and verify product sorting visually + code', () => {
         it(`should sort products by ${option.description}`, async () => {
 
             await step(`Select sort option: ${option.description}`);
-            const selectElem = await inventoryPage.sortSelect;
-            await selectElem.selectByAttribute('value', option.value);
+            await inventoryPage.selectSortOption(option.value);
 
             let items;
             if (option.value === 'lohi' || option.value === 'hilo') {
@@ -48,5 +49,7 @@ describe('TC6: Login and verify product sorting visually + code', () => {
     }
 
 });
+
+
 
 
